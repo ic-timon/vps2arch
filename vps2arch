@@ -357,7 +357,7 @@ while getopts ":b:m:n:h" opt; do
 done
 shift $((OPTIND - 1))
 
-[ -z "$mirrors" ] && mirrors=$(get_mirrors)
+[ -z "$mirrors" ] && mirrors="https://mirrors.cloud.tencent.com/archlinux"
 
 
 if is_openvz; then
