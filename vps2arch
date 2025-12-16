@@ -132,7 +132,7 @@ delete_all() {
 }
 
 install_packages() {
-	local packages="base linux lvm2 openssh reflector vim"
+	local packages="base linux lvm2 openssh reflector vim curl wget xz gzip tar which"
 	[ "$bootloader" != "none" ] && packages="$packages $bootloader"
 	# XXX Install gptdisk for syslinux. To be removed then FS#45029 will be closed
 	[ "$bootloader" = "syslinux" ] && packages="$packages gptfdisk"
@@ -283,15 +283,11 @@ finalize() {
 	# Enable SSH login for user root (#3)
 	sed -i '/^#PermitRootLogin\s/s/.*/&\nPermitRootLogin yes/' /etc/ssh/sshd_config
 	
-	# Run reflector to get updated mirrors
-	
-	cat <<-EOF
-	
-		Reflector: Rating the 35 most recently synced HTTPS servers, sorting them by download speed
-		
+	# Update mirrorlist with Tencent Cloud mirror
+	cat > /etc/pacman.d/mirrorlist <<-EOF
+		# Tencent Cloud Mirror
+		Server = https://mirrors.cloud.tencent.com/archlinux/\$repo/os/\$arch
 	EOF
-	
-	reflector -l 35 -p https --sort rate --save /etc/pacman.d/mirrorlist
 
 	cat <<-EOF
 		Hi,
@@ -357,7 +353,7 @@ while getopts ":b:m:n:h" opt; do
 done
 shift $((OPTIND - 1))
 
-[ -z "$mirrors" ] && mirrors="https://mirrors.cloud.tencent.com/archlinux"
+[ -z "$mirrors" ] && mirrors="https://mirrors.cloud.tencent.com/archlinux/"
 
 
 if is_openvz; then
